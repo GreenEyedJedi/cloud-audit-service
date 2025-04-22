@@ -1,0 +1,8 @@
+{
+    "port": "8080",
+    "awsRegion": "us-west-2",
+    "dbHost": "localhost",
+    "dbUser": "admin",
+    "dbPassword": "secret"
+  }
+  
