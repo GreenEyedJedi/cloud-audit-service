@@ -1,0 +1,29 @@
+apiVersion: apps/v1                 # specifies API version to create the object
+kind: Deployment                    # declares what type of K8 resource we're defining (Deployment manages replica sets and self-healing)
+metadata:                           # metadata about the resource (name, labels, annotations)
+  name: cloud-audit-service
+spec:                               # the desired state for the resource
+  replicas: 1                       # number of pods to run
+  selector:                         # tells K8s which pods belong to the deployment (must match the labels in template.metadata.labels)
+    matchLabels:
+      app: cloud-audit-service
+  template:                         # blueprint for creating pods
+    metadata:
+      labels:                       # labels applied to pods (used by selector)                       
+        app: cloud-audit-service
+    spec:                           # the spec for the pod itself
+      containers:                   # list of containers in the pod
+        - name: cloud-audit-service
+          image: <aws_account_id>.dkr.ecr.us-east-1.amazonaws.com/cloud-audit-service
+          ports:                    # container's exposed ports (used by kubectl p-f and Services)
+            - containerPort: 8080
+          volumeMounts:             # describes how and where the volume is mounted inside the container (plugging the disk to specified path)
+            - name: aws-credentials
+              mountPath: /root/.aws 
+              readOnly: true
+      volumes:                      # defines the source of data, describes where the volume comes from (like defining the "disk")
+        - name: aws-credentials     
+          secret:                   # K8s Secret (volumes can also mount ConfigMaps, EmptyDir, and PersistentVolumeClaims)
+            secretName: aws-credentials  
+      imagePullSecrets:             # necessary for private image regestries like AWS ECR
+        - name: ecr-creds
